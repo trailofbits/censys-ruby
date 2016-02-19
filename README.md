@@ -1,7 +1,7 @@
 # CenSys
 
-* [Homepage](https://github.com/trailofbits/censys#readme)
-* [Issues](https://github.com/trailofbits/censys/issues)
+* [Homepage](https://github.com/trailofbits/censys-ruby#readme)
+* [Issues](https://github.com/trailofbits/censys-ruby/issues)
 * [Documentation](http://rubydoc.info/gems/censys/frames)
 
 ## Description
