@@ -1,4 +1,5 @@
 require 'censys/exceptions'
+require 'censys/search'
 
 require 'net/https'
 require 'json'
@@ -51,7 +52,7 @@ module CenSys
       validate_index! index
 
       post("/search/#{index}",params) do |json|
-        json
+        Search::Response.new(json,index,self)
       end
     end
 
