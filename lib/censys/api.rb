@@ -34,10 +34,21 @@ module CenSys
     # @param [String] secret
     #   The API secret used for authentication.
     #
+    # @raise [ArgumentError]
+    #   Either `id` or `secret` was `nil` or empty.
+    #
     # @see https://censys.io/account
     #   CenSys - My Account
     #
     def initialize(id=ENV['CENSYS_ID'],secret=ENV['CENSYS_SECRET'])
+      if (id.nil? || id.empty?)
+        raise(ArgumentError,"'id' argument required")
+      end
+
+      if (secret.nil? || secret.empty?)
+        raise(ArgumentError,"'secret' argument required")
+      end
+
       @id, @secret = id, secret
     end
 
