@@ -52,7 +52,7 @@ module CenSys
       validate_index! index
 
       post("/search/#{index}",params) do |json|
-        Search::Response.new(json,index,self)
+        Search::Response.new(self,index,params,json)
       end
     end
 
