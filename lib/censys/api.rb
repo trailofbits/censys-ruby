@@ -113,10 +113,10 @@ module CenSys
         response = http.request(req)
 
         case response.code
-        when '200' then yield JSON.parse(response.body)
-        when '404' then raise(NotFound,"#{req.uri} not found")
-        when '429' then raise(RateLimited,"rate limit exceeded")
-        when '500' then raise(InternalServerError,response.body)
+        when '200', '302', then yield JSON.parse(response.body)
+        when '404'         then raise(NotFound,"#{req.uri} not found")
+        when '429'         then raise(RateLimited,"rate limit exceeded")
+        when '500'         then raise(InternalServerError,response.body)
         else
           raise(ResponseError,"unsupported response code returned: #{response.code}")
         end
