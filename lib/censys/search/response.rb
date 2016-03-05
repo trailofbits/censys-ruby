@@ -96,6 +96,15 @@ module CenSys
         end
       end
 
+      #
+      # Provides access to additional pages.
+      #
+      # @return [Enumerator]
+      #
+      def pages
+        enum_for(:each_page)
+      end
+
     end
   end
 end
