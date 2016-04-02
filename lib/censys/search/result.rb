@@ -40,7 +40,7 @@ module CenSys
       # @param [String] name
       #   The dot-separated field name.
       #
-      # @return [String, nil]
+      # @return [Object]
       #
       def [](name)
         @attributes[name]
