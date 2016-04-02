@@ -7,6 +7,8 @@ module CenSys
   module Search
     class Response
 
+      include Enumerable
+
       RESULTS = {
         ipv4:         IPv4,
         websites:     Website,
@@ -56,6 +58,22 @@ module CenSys
       #
       def ok?
         @status == 'ok'
+      end
+
+      #
+      # Enumerates over all results in the response.
+      #
+      # @yield [result]
+      #   The given block will be passed each result.
+      #
+      # @yieldparam [IPv4, Website, Certificate] result
+      #   A result in the response.
+      #
+      # @return [Enumerator]
+      #   If no block is given, an Enumerator will be returned.
+      #
+      def each(&block)
+        @results.each(&block)
       end
 
       #
