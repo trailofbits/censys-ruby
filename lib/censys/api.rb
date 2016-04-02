@@ -1,5 +1,9 @@
 require 'censys/exceptions'
 require 'censys/search'
+require 'censys/report'
+require 'censys/ipv4'
+require 'censys/website'
+require 'censys/certificate'
 
 require 'net/https'
 require 'json'
@@ -13,7 +17,35 @@ module CenSys
 
     URL = "https://#{HOST}/api/v#{VERSION}"
 
-    INDEXES = [:ipv4, :websites, :certificates]
+    class Resource
+
+      def initialize(type,api)
+        @type = type
+        @api  = api
+      end
+
+      #
+      # @see API#search
+      #
+      def search(params={})
+        @api.search(@type,params)
+      end
+
+      #
+      # @see API#view
+      #
+      def [](id)
+        @api.view(@type,id)
+      end
+
+      #
+      # @see API#report
+      #
+      def report(params)
+        @api.report(@type,params)
+      end
+
+    end
 
     # API UID.
     #
@@ -24,6 +56,21 @@ module CenSys
     #
     # @return [String]
     attr_reader :secret
+
+    # IPv4 resource.
+    #
+    # @return [Resource]
+    attr_reader :ipv4
+
+    # Websites resource.
+    #
+    # @return [Resource]
+    attr_reader :websites
+
+    # Certificates resource.
+    #
+    # @return [Resource]
+    attr_reader :certificates
 
     #
     # Initializes the API.
@@ -50,45 +97,93 @@ module CenSys
       end
 
       @id, @secret = id, secret
+
+      @ipv4         = Resource.new(:ipv4,self)
+      @websites     = Resource.new(:websites,self)
+      @certificates = Resource.new(:certificates,self)
     end
 
     #
     # Performs a search.
     #
-    # @param [:ipv4, :websites, :certificates] index
+    # @param [:ipv4, :websites, :certificates] resource
     #
     # @param [Hash] params
+    #   Optional search params.
     #
-    def search(index,params={})
-      validate_index! index
+    # @option params [String] :query
+    #   The query to perform.
+    #
+    # @option params [Fixnum] :page
+    #   Optional page number to request.
+    #
+    # @option params [Array<String>] :fields
+    #   Optional list of fields to include in the results.
+    #
+    # @api private
+    #
+    def search(resource,arams={})
+      post("/search/#{resource}",params) do |json|
+        Search::Response.new(self,resource,params,json)
+      end
+    end
 
-      post("/search/#{index}",params) do |json|
-        Search::Response.new(self,index,params,json)
+    DOCUMENTS = {
+      ipv4:         IPv4,
+      websites:     Website,
+      certificates: Certificate
+    }
+
+    #
+    # Requests the document of the given type.
+    #
+    # @param [:ipv4, :websites, :certificates] resource
+    #
+    # @param [String] id
+    #
+    # @api private
+    #
+    def view(resource,id)
+      document_class = DOCUMENTS.fetch(resource)
+
+      get("/view/#{resource}/#{id}") do |attributes|
+        document_class.new(attributes)
       end
     end
 
     #
-    # Retrieves additional data.
+    # Builds a report of aggregate data.
     #
-    # @param [:ipv4, :websites, :certificates] index
+    # @param [:ipv4, :websites, :certificates] resource
     #
-    # @param [String] id
+    # @param [Hash] params
     #
-    def view(index,id)
-      validate_index! index
+    # @option params [String] :query
+    #   (**Required**) The query to perform.
+    #
+    # @option params [String] :field
+    #   (**Required**) The field to aggregate.
+    #
+    # @option params [Fixnum] :buckets
+    #   Optional maximum number of values to be returned.
+    #
+    # @option params 
+    #
+    def report(resource,params)
+      unless params[:query]
+        raise(ArgumentError,"must specify the :query param")
+      end
 
-      get("/view/#{index}/#{id}") do |json|
-        json
+      unless params[:field]
+        raise(ArgumentError,"must specify the :field param")
+      end
+
+      post("/report/#{resource}",params) do |response|
+        Report::Response.new(response)
       end
     end
 
     private
-
-    def validate_index!(index)
-      unless INDEXES.include?(index)
-        raise(ArgumentError,"unsupported index type: #{index}")
-      end
-    end
 
     #
     # Returns a URL for the API sub-path.
@@ -165,6 +260,12 @@ module CenSys
       post.body = json.to_json
 
       request(post,&block)
+    end
+
+    def validate_index!(index)
+      unless INDEXES.include?(index)
+        raise(ArgumentError,"unsupported index type: #{index}")
+      end
     end
 
   end
