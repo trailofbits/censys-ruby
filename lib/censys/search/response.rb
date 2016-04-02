@@ -1,16 +1,16 @@
 require 'censys/search/metadata'
-require 'censys/ipv4'
-require 'censys/website'
-require 'censys/certificate'
+require 'censys/search/ipv4'
+require 'censys/search/website'
+require 'censys/search/certificate'
 
 module CenSys
   module Search
     class Response
 
       RESULTS = {
-        ipv4:        IPv4,
-        website:     Website,
-        certificate: Certificate
+        ipv4:         IPv4,
+        websites:     Website,
+        certificates: Certificate
       }
 
       attr_reader :status
