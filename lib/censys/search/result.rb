@@ -14,6 +14,38 @@ module CenSys
         @api        = api
       end
 
+      #
+      # The field names.
+      #
+      # @return [Array<String>]
+      #
+      def fields
+        @attributes.keys
+      end
+
+      #
+      # Determines whether the field exists.
+      #
+      # @param [String] name
+      #
+      # @return [Boolean]
+      #
+      def field?(name)
+        @attributes.has_key?(name)
+      end
+
+      #
+      # Provides arbitrary access to the result fields.
+      #
+      # @param [String] name
+      #   The dot-separated field name.
+      #
+      # @return [String, nil]
+      #
+      def [](name)
+        @attributes[name]
+      end
+
     end
   end
 end
