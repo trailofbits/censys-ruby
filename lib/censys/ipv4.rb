@@ -12,10 +12,6 @@ module CenSys
     include HasLocation
     include HasASN
 
-    def address
-      @attributes['address']
-    end
-
     def ip
       @attributes['ip']
     end
