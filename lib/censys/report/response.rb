@@ -4,6 +4,8 @@ module CenSys
   module Report
     class Response
 
+      include Enumerable
+
       # Response status.
       #
       # @return [String]
