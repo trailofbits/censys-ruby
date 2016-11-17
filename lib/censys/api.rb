@@ -122,7 +122,7 @@ module CenSys
     #
     # @api private
     #
-    def search(resource,arams={})
+    def search(resource,params={})
       post("/search/#{resource}",params) do |json|
         Search::Response.new(self,resource,params,json)
       end
@@ -167,7 +167,7 @@ module CenSys
     # @option params [Fixnum] :buckets
     #   Optional maximum number of values to be returned.
     #
-    # @option params 
+    # @option params
     #
     def report(resource,params)
       unless params[:query]
